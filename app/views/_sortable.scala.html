@@ -1,0 +1,11 @@
+@import GetLineItemsRequest._
+
+@(request: GetLineItemsRequest, sortBy: String)(content: Html)
+
+@sortDirection = {}
+<a href="@routes.HomeController.invoice(request.toggleSort(sortBy))" style="display: block;">
+  <i class="float-right fas @if(request.getSortBy == sortBy) {
+    @if(request.getSortDirection == SORT_ASC) {fa-sort-up} else {fa-sort-down}
+  } else {fa-sort}"></i>
+  @content
+</a>

@@ -1,0 +1,146 @@
+@import GetLineItemsRequest._
+
+@(groupedLineItems: Seq[(Campaign, Option[LineItem])], total: Int, grandTotal: BigDecimal,
+        campaigns: Seq[(Campaign, Int)], request: GetLineItemsRequest)(implicit r: RequestHeader, flash: Flash)
+
+@dollarFormat(amount: BigDecimal) = {@{ "$%.2f".format(amount) }}
+
+@main("Invoice") {
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <br>
+        @*<button type="button" class="btn btn-light float-right">*@
+          @*<i class="fas fa-user"></i>*@
+          @*sign in*@
+        @*</button>*@
+        <h1>Invoice</h1>
+        <hr>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-2">
+        @_import_export(request, total)
+      </div>
+
+      <div class="col-3">
+        <div class="campaign-filters d-none">
+          <i class="fas fa-filter"></i>
+          <label for="campaign-filter-select">Campaigns:</label>
+          <select id="campaign-filter-select" multiple>
+            @for((campaign, count) <- campaigns) {
+              <option value="@campaign.id" @if(campaign.id.exists(request.campaignIds.contains)) {selected="selected"}>
+                @campaign.name (@count)
+              </option>
+            }
+          </select>
+          @defining(routes.HomeController.invoice(request.copy(campaignIds = Nil, pageOffset = Some(0)))) { clearedRoute =>
+            <div style="display: inline-block;">
+              <button id="apply-campaign-id-filters" class="btn btn-link" type="button"
+                      data-cleared-route="@clearedRoute">
+                apply
+              </button>
+              |
+              <a class="btn btn-link" href="@clearedRoute">clear</a>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="col-7">
+        @_pagination(request, total)
+      </div>
+    </div>
+
+    <div class="row">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>@_sortable(request, SORT_BY_LINE_ITEM_ID){ Id }</th>
+              <th class="hover-expand">
+                <span class="hover-expand-out hover-expand-in">
+                  @_sortable(request, SORT_BY_LINE_ITEM_NAME){ Name }
+                </span>
+              </th>
+              <th style="min-width: 135px;">@_sortable(request, SORT_BY_CAMPAIGN_ID){ Campaign Id }</th>
+              <th class="hover-expand">
+                <span class="hover-expand-out hover-expand-in">
+                  @_sortable(request, SORT_BY_CAMPAIGN_NAME){ Campaign Name }
+                </span>
+              </th>
+              <th class="hover-expand">
+                <span class="hover-expand-out hover-expand-in">
+                  @_sortable(request, SORT_BY_BOOKED_AMOUNT){ Booked Amount }
+                </span>
+              </th>
+              <th class="hover-expand">
+                <span class="hover-expand-out hover-expand-in">
+                  @_sortable(request, SORT_BY_ACTUAL_AMOUNT){ Actual Amount }
+                </span>
+              </th>
+              <th class="hover-expand">
+                <span class="hover-expand-out hover-expand-in">
+                  @_sortable(request, SORT_BY_ADJUSTMENTS){ Adjustments }
+                </span>
+              </th>
+              <th class="hover-expand">
+                <span class="hover-expand-out hover-expand-in">
+                  @_sortable(request, SORT_BY_BILLABLE){ Billable }
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for((campaign, lineItems) <- groupedLineItems; lineItem <- lineItems) {
+              <tr>
+                <td>@lineItem.id</td>
+                <td class="hover-expand">
+                  <span class="hover-expand-out">@lineItem.displayName</span>
+                  <span class="hover-expand-in">@lineItem.name</span>
+                </td>
+                <td>@campaign.id</td>
+                <td class="hover-expand">
+                  <span class="hover-expand-out">@campaign.displayName</span>
+                  <span class="hover-expand-in">@campaign.name</span>
+                </td>
+                <td class="hover-expand">
+                  <span class="hover-expand-out">@dollarFormat(lineItem.bookedAmount)</span>
+                  <span class="hover-expand-in">@lineItem.bookedAmount</span>
+                </td>
+                <td class="hover-expand">
+                  <span class="hover-expand-out">@dollarFormat(lineItem.actualAmount)</span>
+                  <span class="hover-expand-in">@lineItem.actualAmount</span>
+                </td>
+                <td class="hover-expand">
+                  <span class="hover-expand-out">@dollarFormat(lineItem.adjustments)</span>
+                  <span class="hover-expand-in">@lineItem.adjustments</span>
+                </td>
+                <td class="hover-expand">
+                  <span class="hover-expand-out">@dollarFormat(lineItem.billableAmount)</span>
+                  <span class="hover-expand-in">@lineItem.billableAmount</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="7" class="text-right">Grand Total</td>
+              <td title="@grandTotal">
+                @dollarFormat(grandTotal)
+                <br>
+                (@total)
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+        @_pagination(request, total)
+        </div>
+      </div>
+    </div>
+  </div>
+}

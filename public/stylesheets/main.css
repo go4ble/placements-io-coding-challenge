@@ -1,0 +1,30 @@
+.hover-expand-in {
+    display: none;
+}
+
+.hover-expand-in.hover-expand-out {
+    display: inline;
+}
+
+.hover-expand.in .hover-expand-in {
+    display: inline;
+}
+
+.hover-expand.in .hover-expand-out {
+    display: none;
+}
+
+
+ul.multiselect-container {
+    width: 600px;
+}
+
+ul.multiselect-container > li > a > label.checkbox {
+    padding-left: 20px;
+}
+
+.custom-file-input:lang(en) ~ .custom-file-label::after {
+    font-weight: 900;
+    font-family: "Font Awesome 5 Free";
+    content: "\f574";
+}

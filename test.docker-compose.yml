@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  test:
+    image: bigtruedata/sbt:1.0.1-2.12
+    volumes:
+      - ./:/app
+    command: sbt test

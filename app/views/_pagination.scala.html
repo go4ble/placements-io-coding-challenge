@@ -1,0 +1,36 @@
+@(request: GetLineItemsRequest, total: Int)
+
+<nav class="float-right">
+    <div class="dropdown float-left">
+        <button class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown">
+            @request.getPageSize rows
+        </button>
+        <div class="dropdown-menu">
+        @for(pageSize <- GetLineItemsRequest.PAGE_SIZES) {
+            <a class="dropdown-item @if(request.getPageSize == pageSize) {active}"
+            href="@routes.HomeController.invoice(request.copy(pageSize = Some(pageSize), pageOffset = None))">
+            @pageSize
+            </a>
+        }
+        </div>
+    </div>
+    <ul class="pagination">
+        <li class="page-item @if(request.getPageOffset <= 0) {disabled}">
+            <a class="page-link" href="@routes.HomeController.invoice(request.pageFrom(-1))">
+                <i class="fas fa-angle-left"></i>
+            </a>
+        </li>
+        @for(page <- request.pagination(total)) {
+            <li class="page-item @if(page.isEmpty || page.get == request.getPageOffset + 1) {disabled}">
+                <a class="page-link" href="@routes.HomeController.invoice(request.copy(pageOffset = page.map(_ - 1)))">
+                @page.getOrElse("...")
+                </a>
+            </li>
+        }
+        <li class="page-item @if(request.getPageOffset >= total / request.getPageSize - 1) {disabled}">
+            <a class="page-link" href="@routes.HomeController.invoice(request.pageFrom(+1))">
+                <i class="fas fa-angle-right"></i>
+            </a>
+        </li>
+    </ul>
+</nav>

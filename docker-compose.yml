@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+
+  db:
+    image: postgres:10.4
+    restart: always
+    environment:
+      POSTGRES_USER: web
+      POSTGRES_PASSWORD: web
+    volumes:
+      - ./db-scripts.d:/docker-entrypoint-initdb.d
+
+  web:
+    image: openjdk:8
+    volumes:
+      - ./dist:/dist
+    ports:
+      - "9000:9000"
+    command: >
+      bash -c "unzip /dist/placements-interview-1.0-SNAPSHOT.zip -d / &&
+      /placements-interview-1.0-SNAPSHOT/bin/placements-interview -Dplay.http.secret.key=supersecret"

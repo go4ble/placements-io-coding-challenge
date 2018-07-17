@@ -1,0 +1,33 @@
+@import helper._
+
+@(request: GetLineItemsRequest, total: Int)(implicit r: RequestHeader, flash: Flash)
+
+@flash.get("uploadNotice").map { notice =>
+    <script>alert("@notice")</script>
+}
+
+<div class="dropdown" style="width: 250px;">
+    <button class="btn dropdown-toggle @if(total == 0) {btn-warning} else {btn-light}" type="button" data-toggle="dropdown">
+        @*<i class="fas fa-file-export"></i> Export @if(request.campaignIds.nonEmpty) {(with filters)}*@
+        Import @if(total > 0) {/ Export}
+    </button>
+    <div class="dropdown-menu">
+        @if(total > 0) {
+            <h6 class="dropdown-header"><i class="fas fa-file-export"></i> Export</h6>
+            <a class="dropdown-item" href="@routes.HomeController.exportCsv(request)">
+                to CSV @if(request.campaignIds.nonEmpty) {(with filters)}
+            </a>
+            <div class="dropdown-divider"></div>
+        }
+        <h6 class="dropdown-header"><i class="fas fa-file-import"></i> Import</h6>
+        @helper.form(routes.HomeController.upload(request), 'enctype -> "multipart/form-data") {
+            @CSRF.formField
+            <div style="padding: 0 0.5rem 0 1.5rem;">
+                <div class="custom-file">
+                    <input type="file" name="data" id="input-import" class="custom-file-input">
+                    <label class="custom-file-label" for="input-import">Choose file</label>
+                </div>
+            </div>
+        }
+    </div>
+</div>
