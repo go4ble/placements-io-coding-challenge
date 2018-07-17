@@ -18,7 +18,7 @@ $(function () {
         var url = $(this)[0].dataset['clearedRoute'];
         var values = $('#campaign-filter-select').val();
         for (var i = 0; i < values.length; i++) {
-            url += "campaignId=" + values[i];
+            url += "&campaignId=" + values[i];
         }
         window.location.href = url;
     });
